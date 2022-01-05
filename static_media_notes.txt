@@ -1,0 +1,53 @@
+static 称为静态文件夹，是不变的，形成网站的核心部件，如 CSS文件，JS文件，背景图片等；可为Templates模板提供支持
+media 称为媒体文件夹，是变动的，由用户定义的文件，如 用户头像， 用户上传的图片或视频等；可为富文本编辑器mdeditor提供支持
+
+Django的静态文件处理一般分debug模式和非debug模式
+
+debug模式的情况下允许访问静态资源，无需STATIC_ROOT
+非debug模式也就是生产模式，在服务器运行时， 静态资源需要使用nginx或者apache之类的工具维护
+
+1. 配置Static文件
+1) STATIC_URL - 可以理解为通过url访问static文件的路径，
+
+如 项目路径是，{undefined{projectName}}/static/common_static/test.css
+
+​ 则访问url是： http://IP/static/common_static/test.css
+
+2) STATIC_ROOT - 可以理解为你打算在服务器上存储static文件的路径（通过 python manage.py collectstatic命令），collectstatic命令后将复制静态文件到STATIC_ROOT指定的目录中， 部署django项目的时候需要
+
+3) STATICFILES_DIRS - 可以理解为配置Django寻找静态文件时首先去STATICFILES_DIRS里面寻找， 其次再到各个app的static文件夹里面找，Django查找静态文件是惰性查找，查找到第一个，就停止查找了
+
+django放置静态文件有两种方式，一是在每个app里新建一个static目录，将静态文件放置其中；另一种是对公共文件的处理，如jQuery bootstrap等，这时就需要配置 STATICFILES_DIRS。
+
+#开发阶段放置项目自己的静态文件，不能包含STATIC_ROOT路径
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'templates', 'static')]
+
+
+#部署阶段，执行collectstatic命令后会将项目中的静态文件（包括STATICFILES_DIRS、自带admin的静态文件）收集到该目录下面（所以不应该在该目录下放置自己的一些静态文件，因为会覆盖）
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'collect_static')]
+
+
+模板文件使用 {% load staticfiles %} 运行
+
+2. 配置media文件
+MEDIA_ROOT - 设置用户上传文件的实际保存目录，该文件夹自动创建
+
+MEDIA_URL - 代表用户通过URL来访问这个本地地址的URL
+
+如 本机MEDIA_URL 为”/media/”则访问url是： http://IP/media/***
+
+如果需要靠django提供media文件的访问，需要在url.py中加入：
+from django.conf import settings
+from django.views.static import serve
+
+urlpatterns = [
+    re_path('media/(?P<path>.*)$', serve, {'document_root':MEDIA_ROOT},
+]
+
+
+FileField或ImageField字段适用于存储文件/图片，出于性能考虑，文件并不直接保存到数据库，而是保存在文件系统里，因此该字段只是记录一个路径而已。
+
+
+

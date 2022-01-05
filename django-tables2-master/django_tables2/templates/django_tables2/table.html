@@ -1,0 +1,139 @@
+{% load django_tables2 %}
+{% load i18n %}
+{% block table-wrapper %}
+<div class="table-container">
+        {% block pagination %}
+
+       <div class="flex flex-col items-center my-12">
+    <div class="">
+   {% if table.page.has_other_pages %}
+
+  <ul class="flex  ">
+    {% if table.page.has_previous %}
+    <!--enable previous button and link it to the previous page if there is previous page-->
+      <li><a href="?page={{ table.page.previous_page_number }}">
+            <div class="h-8 w-8 mr-1 flex justify-center items-center rounded-full bg-gray-200 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left w-4 h-4">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </div>
+      </a></li>
+    {% else %}
+     <!--disable the previous button if there is no previous page-->
+      <li><span>
+        <div class="h-8 w-8 mr-1 flex justify-center items-center rounded-full bg-gray-100  opacity-50 cursor-not-allowed">
+                <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left w-4 h-4">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </div>
+      </span></li>
+    {% endif %}
+    <!--iterating through pages objects-->
+    {% for i in table.page.paginator.page_range%}
+      {% if table.page.number == i %}
+      <!--apply active classes to a currently active page-->
+        <li class="w-8 md:flex justify-center items-center cursor-pointer leading-5 transition duration-150 ease-in  rounded-full   text-center bg-pink-600 text-white">{{ i }}</li>
+     {% else%}
+         {%if i|add:"5" >= table.page.number and i|add:"-5" <= table.page.number %}
+            <li class= "w-8 md:flex justify-center items-center cursor-pointer leading-5 transition duration-150 ease-in  rounded-full "><a href="{% querystring table.prefixed_page_field=i %}">{{ i }}</a></li>   
+         {%endif%}
+    {% comment %} {% else %}
+        {% if table.page.number >= i|add:"-5" or table.page.number <= i|add:"5" %}
+      <!--apply inactive classes to inactive pages -->
+       <li class= "w-8 md:flex justify-center items-center cursor-pointer leading-5 transition duration-150 ease-in  rounded-full "><a href="{% querystring table.prefixed_page_field=i %}">{{ i }}</a></li>   
+         {% endif %}  {% endcomment %}
+      {% endif %}
+    {% endfor %}
+    {% if table.page.has_next %}
+      <li><a href="?page={{ table.page.next_page_number }}">
+      <!--apply active classes and link the next page button to the next page link-->
+          <div class="h-8 w-8 ml-1 flex justify-center items-center rounded-full bg-gray-200 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right w-4 h-4">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        </div>
+      </a></li>
+    {% else %}
+      <li class=""><span>
+      <!--disable the next page button if there is no next page in the pagination class -->
+       <div class="h-8 w-8 ml-1 flex justify-center items-center rounded-full  bg-gray-100 opacity-50 cursor-not-allowed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right w-4 h-4">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        </div>
+      </span></li>
+        {% endif %}
+        <li class='px-10 font-medium text-gray-500'>Showing {{ table.page.start_index }}-{{ table.page.end_index }} of {{ page.paginator.count }}{{table.page.paginator.count}}</li>
+    </ul>
+    {% endif %}
+    </div>
+    </div>
+    {% endblock pagination %}
+    
+    {% block table %}
+<div class="flex flex-col">
+  <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+      <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+    <table {% render_attrs table.attrs class="text-left" %} class="min-w-full divide-y divide-gray-200">
+        {% block table.thead %}
+        {% if table.show_header %}
+        <thead {{ table.attrs.thead.as_html }} class="bg-gray-50">
+            <tr >
+                {% for column in table.columns %}
+                <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider" {{ column.attrs.th.as_html }}>
+                    {% if column.orderable %}
+                    <a
+                        href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}">{{ column.header }}</a>
+                    {% else %}
+                    {{ column.header }}
+                    {% endif %}
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        {% endif %}
+        {% endblock table.thead %}
+        {% block table.tbody %}
+        <tbody {{ table.attrs.tbody.as_html }} >
+            {% for row in table.paginated_rows %}
+            {% block table.tbody.row %}
+            <tr {{ row.attrs.as_html }} >
+                {% for column, cell in row.items %}
+                <td class="truncate px-5 py-5 border-b border-gray-200  text-sm" {{ column.attrs.td.as_html }}>
+                    {% if column.localize == None %}{{ cell }}{% else %}{% if column.localize %}{{ cell|localize }}{% else %}{{ cell|unlocalize }}{% endif %}{% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endblock table.tbody.row %}
+            {% empty %}
+            {% if table.empty_text %}
+            {% block table.tbody.empty_text %}
+            <tr>
+                <td colspan="{{ table.columns|length }}">{{ table.empty_text }}</td>
+            </tr>
+            {% endblock table.tbody.empty_text %}
+            {% endif %}
+            {% endfor %}
+        </tbody>
+        {% endblock table.tbody %}
+        {% block table.tfoot %}
+        {% if table.has_footer %}
+        <tfoot {{ table.attrs.tfoot.as_html }}>
+            <tr>
+                {% for column in table.columns %}
+                <td {{ column.attrs.tf.as_html }}>{{ column.footer }}</td>
+                {% endfor %}
+            </tr>
+        </tfoot>
+        {% endif %}
+        {% endblock table.tfoot %}
+    </table>
+</div>
+</div>
+</div>
+</div>
+    {% endblock table %}
+ 
+</div>
+{% endblock table-wrapper %}
