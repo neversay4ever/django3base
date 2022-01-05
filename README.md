@@ -22,7 +22,7 @@ django-extensions
 
 
 django-tables2用改造了base.html（tailwindcss）的版本
-
+django-tables2-master/django_tables2/tables.py 中per_page的默认值由25改为10
 
 
 1. 全部使用tailwindcss 
