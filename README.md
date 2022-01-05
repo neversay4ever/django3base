@@ -21,7 +21,6 @@ django-extensions
 
 
 
-
 django-tables2用改造了base.html（tailwindcss）的版本
 
 
@@ -37,6 +36,12 @@ django-tables2用改造了base.html（tailwindcss）的版本
 5. 一个demo app，展示如何使用django-admin-tailwind, django-tables2
 
    
+#使用步骤
+1. python3 -m venv django3base
+2. source django3base/bin/activate
+3. pip install -r requirements.txt
+4. python manage.py runserver_plus
+5. python magage.py tailwind start  (另一个terminal窗口)
 
 
 
