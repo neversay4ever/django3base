@@ -41,8 +41,8 @@ django-tables2用改造了base.html（tailwindcss）的版本
 2. source django3base/bin/activate
 3. pip install -r requirements.txt
 4. python manage.py runserver_plus
-5. python magage.py tailwind start  (另一个terminal窗口)
-
+5. python manage.py tailwind start  (另一个terminal窗口)
+6. python manage.py tailwind start
 
 
 
