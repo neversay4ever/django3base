@@ -141,7 +141,7 @@ class TableOptions:
         self.order_by = OrderByTuple(order_by) if order_by is not None else None
         self.order_by_field = getattr(options, "order_by_field", "sort")
         self.page_field = getattr(options, "page_field", "page")
-        self.per_page = getattr(options, "per_page", 25)
+        self.per_page = getattr(options, "per_page", 10)
         self.per_page_field = getattr(options, "per_page_field", "per_page")
         self.prefix = getattr(options, "prefix", "")
         self.show_header = getattr(options, "show_header", True)
